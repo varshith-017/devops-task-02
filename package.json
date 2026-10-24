@@ -1,0 +1,17 @@
+{
+  "name": "devopsflow-task-2",
+  "version": "1.0.0",
+  "description": "Node.js web app for a Jenkins CI/CD assignment",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "start:web": "node -e \"require('child_process').spawn('node',['app.js'],{detached:true,stdio:'ignore'}).unref(); setTimeout(()=>require('child_process').exec('start http://localhost:3000'),1500)\"",
+    "test": "node --test app.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "open": "^11.0.4"
+  }
+}
