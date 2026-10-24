@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -7,7 +6,8 @@ pipeline {
     }
 
     environment {
-        APP_IMAGE = 'devops-task-2-web-app:latest'
+        DOCKERHUB_USERNAME = 'YOUR_DOCKERHUB_USERNAME'
+        APP_IMAGE = "${DOCKERHUB_USERNAME}/devops-task-2-web-app:latest"
         APP_CONTAINER = 'devops-task-2-web-app'
     }
 
@@ -26,9 +26,28 @@ pipeline {
             }
         }
 
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                sh 'docker push "$APP_IMAGE"'
+            }
+        }
+
         stage('Deploy') {
             steps {
-                echo 'Deploying web application...'
                 sh '''
                     docker rm -f "$APP_CONTAINER" 2>/dev/null || true
                     docker run -d \
@@ -42,11 +61,14 @@ pipeline {
     }
 
     post {
+        always {
+            sh 'docker logout || true'
+        }
         success {
-            echo 'Build, test and deployment succeeded!'
+            echo 'Build, test, push and deployment succeeded!'
         }
         failure {
-            echo 'Pipeline failed. Check Jenkins Console Output.'
+            echo 'Pipeline failed. Check Console Output.'
         }
     }
 }
