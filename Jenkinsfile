@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKERHUB_USERNAME = 'YOUR_DOCKERHUB_USERNAME'
+        DOCKERHUB_USERNAME = 'varshithap123'
         APP_IMAGE = "${DOCKERHUB_USERNAME}/devops-task-2-web-app:latest"
         APP_CONTAINER = 'devops-task-2-web-app'
     }
