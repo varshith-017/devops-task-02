@@ -1,27 +1,29 @@
+
 pipeline {
     agent any
 
-    triggers {
-        pollSCM('* * * * *')
-    }
-
     environment {
         DOCKERHUB_USERNAME = 'varshithap123'
-        APP_IMAGE = "${DOCKERHUB_USERNAME}/devops-task-2-web-app:latest"
+        APP_IMAGE = 'varshithap123/devops-task-2-web-app:latest'
         APP_CONTAINER = 'devops-task-2-web-app'
     }
 
     stages {
-        stage('Build') {
+        stage('Checkout GitHub') {
             steps {
-                echo 'Building Docker image...'
+                git branch: 'main',
+                    url: 'https://github.com/varshith-017/devops-task-02.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
                 sh 'docker build -t "$APP_IMAGE" .'
             }
         }
 
-        stage('Test') {
+        stage('Test Application') {
             steps {
-                echo 'Running automated tests...'
                 sh 'docker run --rm "$APP_IMAGE" npm test'
             }
         }
@@ -34,19 +36,20 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        echo "$DOCKER_PASS" | docker login \
+                            -u "$DOCKER_USER" --password-stdin
                     '''
                 }
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push Docker Image') {
             steps {
                 sh 'docker push "$APP_IMAGE"'
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Application') {
             steps {
                 sh '''
                     docker rm -f "$APP_CONTAINER" 2>/dev/null || true
@@ -65,7 +68,7 @@ pipeline {
             sh 'docker logout || true'
         }
         success {
-            echo 'Build, test, push and deployment succeeded!'
+            echo 'CI/CD pipeline completed successfully!'
         }
         failure {
             echo 'Pipeline failed. Check Console Output.'
