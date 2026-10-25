@@ -64,14 +64,12 @@ pipeline {
     }
 
     post {
-        always {
-            sh 'docker logout || true'
-        }
-        success {
-            echo 'CI/CD pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check Console Output.'
+    success {
+        echo 'CI/CD pipeline completed successfully!'
+    }
+    failure {
+        echo 'Pipeline failed. Check Console Output.'
+    }
         }
     }
 }
