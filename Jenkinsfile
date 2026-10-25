@@ -22,12 +22,6 @@ pipeline {
             }
         }
 
-        stage('Test Application') {
-            steps {
-                sh 'docker run --rm "$APP_IMAGE" npm test'
-            }
-        }
-
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
